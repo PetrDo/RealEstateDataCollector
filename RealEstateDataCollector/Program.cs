@@ -13,9 +13,6 @@ namespace RealEstateDataCollector
             Property p = new Apartment(PropertyTransaction.Rent, "xxx", "xxx", "xxx", 12000, DateTime.Today, DateTime.Today, true);
             Console.WriteLine("");
 
-            /**
-             @todo Do something 
-             */
         }
     }
 }
