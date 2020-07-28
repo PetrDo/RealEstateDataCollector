@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RealEstateDataCollector
+namespace RealEstateDataCollector.PropertyObjects
 {
     public enum PropertyType { Apartment, House, Lot }
     public enum PropertyTransaction { Sale, Rent }
 
 
-    abstract class Property
+    abstract class BasePropertyObject
     {
         public PropertyType Type { get; private set; }
         public PropertyTransaction Transaction { get; private set; }
@@ -23,7 +23,7 @@ namespace RealEstateDataCollector
         public bool IsOnMarketToday { get; private set; }
         public TimeSpan DaysOnMarket { get => MarketExitDate - MarketEntryDate + TimeSpan.FromDays(1); }
 
-        public Property(PropertyType type, PropertyTransaction transaction, string title, string location, string link, int price, DateTime marketEntryDate, DateTime marketExitDate, bool isOnMarketToday)
+        public BasePropertyObject(PropertyType type, PropertyTransaction transaction, string title, string location, string link, int price, DateTime marketEntryDate, DateTime marketExitDate, bool isOnMarketToday)
         {
             Type = type;
             Transaction = transaction;
@@ -35,5 +35,7 @@ namespace RealEstateDataCollector
             MarketExitDate = marketExitDate;
             IsOnMarketToday = isOnMarketToday;
         }
+
+        abstract public int PricePerMeter();
     }
 }

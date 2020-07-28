@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RealEstateDataCollector.PropertyObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace RealEstateDataCollector
     {
         static void Main(string[] args)
         {
-            Property p = new Apartment(PropertyTransaction.Rent, "xxx", "xxx", "xxx", 12000, DateTime.Today, DateTime.Today, true);
+            BasePropertyObject p = new Apartment(PropertyTransaction.Rent, "xxx", "xxx", "xxx", 12000, DateTime.Today, DateTime.Today, true, 32, Features.Balcony | Features.Cellar);
             Console.WriteLine("");
 
         }
