@@ -28,15 +28,35 @@ namespace RealEstateDataCollector.PropertyObjects
         Elevator = 2048
     }
 
-    class Apartment : BasePropertyObject
+    public enum Rooms
+    {
+        _unknown,
+        _1_kk,
+        _1_1,
+        _2_kk,
+        _2_1,
+        _3_kk,
+        _3_1,
+        _4_kk,
+        _4_1,
+        _5_kk,
+        _5_1,
+        _6_plus,
+        _atypical
+    }
+
+    public class Apartment : BasePropertyObject
     {
         public int Size_m2 { get; private set; }
+        public Rooms Rooms { get; private set; }
         public Features Features { get; private set; }
 
 
-        public Apartment(PropertyTransaction transaction, string title, string location, string link, int price, DateTime marketEntryDate, DateTime marketExitDate, bool isOnMarketToday, int size_m2, Features features) : base(PropertyType.Apartment, transaction, title, location, link, price, marketEntryDate, marketExitDate, isOnMarketToday)
+        //public Apartment(PropertyTransaction transaction, string title, string location, string link, int price, DateTime marketEntryDate, DateTime marketExitDate, bool isOnMarketToday, int size_m2, Rooms rooms, Features features) : base(PropertyType.Apartment, transaction, title, location, link, price, marketEntryDate, marketExitDate, isOnMarketToday)
+        public Apartment(PropertyTransaction transaction, string title, string location, string link, int price, int size_m2, Rooms rooms, Features features) : base(PropertyType.Apartment, transaction, title, location, link, price)
         {
             Size_m2 = size_m2;
+            Rooms = rooms;
             Features = features;
         }
 

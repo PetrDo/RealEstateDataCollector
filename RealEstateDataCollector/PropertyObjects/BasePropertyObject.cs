@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,24 +7,25 @@ using System.Threading.Tasks;
 
 namespace RealEstateDataCollector.PropertyObjects
 {
-    public enum PropertyType { Apartment, House, Lot }
-    public enum PropertyTransaction { Sale, Rent }
+    public enum PropertyType { Unknown, Apartment, House, Lot }
+    public enum PropertyTransaction { Unknown, Sale, Rent }
 
 
-    abstract class BasePropertyObject
+    public abstract class BasePropertyObject
     {
-        public PropertyType Type { get; private set; }
-        public PropertyTransaction Transaction { get; private set; }
-        public string Title { get; private set; }
-        public string Location { get; private set; }
-        public string Link { get; private set; }
-        public int Price { get; private set; }
-        public DateTime MarketEntryDate { get; private set; }
-        public DateTime MarketExitDate { get; private set; }
-        public bool IsOnMarketToday { get; private set; }
-        public TimeSpan DaysOnMarket { get => MarketExitDate - MarketEntryDate + TimeSpan.FromDays(1); }
+        protected PropertyType Type { get; private set; }
+        protected PropertyTransaction Transaction { get; private set; }
+        protected string Title { get; private set; }
+        protected string Location { get; private set; }
+        protected string Link { get; private set; }
+        protected int Price { get; private set; }
+        //protected DateTime MarketEntryDate { get; private set; }
+        //protected DateTime MarketExitDate { get; private set; }
+        //protected bool IsOnMarketToday { get; private set; }
+        //protected TimeSpan DaysOnMarket { get => MarketExitDate - MarketEntryDate + TimeSpan.FromDays(1); }
 
-        public BasePropertyObject(PropertyType type, PropertyTransaction transaction, string title, string location, string link, int price, DateTime marketEntryDate, DateTime marketExitDate, bool isOnMarketToday)
+        //public BasePropertyObject(PropertyType type, PropertyTransaction transaction, string title, string location, string link, int price, DateTime marketEntryDate, DateTime marketExitDate, bool isOnMarketToday)
+        public BasePropertyObject(PropertyType type, PropertyTransaction transaction, string title, string location, string link, int price)
         {
             Type = type;
             Transaction = transaction;
@@ -31,11 +33,12 @@ namespace RealEstateDataCollector.PropertyObjects
             Location = location;
             Link = link;
             Price = price;
-            MarketEntryDate = marketEntryDate;
-            MarketExitDate = marketExitDate;
-            IsOnMarketToday = isOnMarketToday;
+            //MarketEntryDate = marketEntryDate;
+            //MarketExitDate = marketExitDate;
+            //IsOnMarketToday = isOnMarketToday;
         }
 
-        abstract public int PricePerMeter();
+        public abstract int PricePerMeter();
+
     }
 }

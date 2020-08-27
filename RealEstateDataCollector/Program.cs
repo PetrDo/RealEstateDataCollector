@@ -1,7 +1,12 @@
-﻿using RealEstateDataCollector.PropertyObjects;
+﻿using OpenQA.Selenium.Chrome;
+using RealEstateDataCollector.PageObjects;
+using RealEstateDataCollector.PropertyObjects;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,9 +16,34 @@ namespace RealEstateDataCollector
     {
         static void Main(string[] args)
         {
-            BasePropertyObject p = new Apartment(PropertyTransaction.Rent, "xxx", "xxx", "xxx", 12000, DateTime.Today, DateTime.Today, true, 32, Features.Balcony | Features.Cellar);
-            Console.WriteLine("");
+            string URL = "https://www.sreality.cz/hledani/prodej/byty/praha";
+            ChromeDriver driver;
+            PageSReality page;
 
+            ChromeOptions options = new ChromeOptions();
+            //options.AddArgument("--headless");
+            //options.AddArgument("--window-size=1300,1000");
+
+            driver = new ChromeDriver(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), options);
+            //driver.Manage().Window.Size = new Size(650, 500);
+            // top left of the primary monitor
+            //driver.Manage().Window.Position = new Point(0, 0);
+
+            driver.Url = URL;
+
+            page = new PageSReality(driver);
+
+            List<BasePropertyObject> data = new List<BasePropertyObject>();
+
+            data.AddRange(page.PullData());
+
+            driver.Close();
+
+
+
+            //BasePropertyObject p = new Apartment(PropertyTransaction.Rent, "xxx", "xxx", "xxx", 12000, DateTime.Today, DateTime.Today, true, 32, Features.Balcony | Features.Cellar);
+            Console.WriteLine("");
+            Console.ReadKey();
         }
     }
 }
@@ -59,86 +89,7 @@ def click_to_next_page(webdriver):
     #else:
     #    driver.get( url )
  
-def pull_data(webdriver):
 
-    data = []
-
-    logger.info('Pulling data from ' + webdriver.current_url)
-
-    #<div class="property ng-scope">
-    properties_on_page = webdriver.find_elements(By.CLASS_NAME, "property")
-
-    for property in properties_on_page:
-
-        o_transaction = "Not Assigned"
-        o_type = "Not Assigned"
-        o_m2 = 0
-
-        # <h2>
-        #   <a ng-href="/detail/prodej/byt/1+1/praha-krc-bernolakova/1416506972" class="title" href="/detail/prodej/byt/1+1/praha-krc-bernolakova/1416506972">
-        #     <span class="name ng-binding">Prodej bytu 1+1&nbsp;43&nbsp;m²</span>
-        #   </a>
-        # </h2>
-        header_string = property.find_element(By.CSS_SELECTOR, "h2 > a > span.name").text
-
-        try:
-            if "Prodej bytu" in header_string:
-                tmp = header_string.split(" ")
-                o_transaction = header_string[:11]
-                o_type = tmp[2]
-                o_m2 = tmp[3]
-        except Exception as e:
-            print(e.args)
-
-        #<span class="price ng-scope" ng-if="i.price">
-        #    <span class="norm-price ng-binding">2&nbsp;580&nbsp;000&nbsp;Kč</span>
-        o_price = property.find_element(By.CLASS_NAME, "price").text.replace(" ", "").replace("Kč", "")
-                
-        # <span class="locality ng-binding">Bernolákova, Praha - Krč</span>
-        o_locality = property.find_element(By.CLASS_NAME, "locality").text
-
-        # <span ng-repeat="label in i.labels" class="label ng-binding ng-scope">Družstevní                </span>
-        # <span ng-repeat="label in i.labels" class="label ng-binding ng-scope">Sklep                     </span>
-        # <span ng-repeat="label in i.labels" class="label ng-binding ng-scope">Výtah                     </span>
-        # <span ng-repeat="label in i.labels" class="label ng-binding ng-scope">Osobní vlastnictví        </span>
-        # <span ng-repeat="label in i.labels" class="label ng-binding ng-scope">Lodžie                    </span>
-
-        property_labels = property.find_elements(By.CLASS_NAME, "label")
-        labels = []
-        [labels.append(label.text) for label in property_labels]
-        
-        data.append([
-            o_transaction, 
-            o_type, 
-            o_m2, 
-            o_price, 
-            o_locality,
-            set_if_label_found("Novostavba",  labels),
-            set_if_label_found("Družstevní",  labels),
-            set_if_label_found("Balkon",      labels),
-           ])
-
-        # Log remaining labels
-        if labels: logger.warning("Property labels not stored in DB:" + ' '.join(map(str, labels)))
-            
-
-#                        <h2>
-#                            <a ng-href="/detail/prodej/byt/1+1/praha-krc-bernolakova/1416506972" class="title" href="/detail/prodej/byt/1+1/praha-krc-bernolakova/1416506972">
-#                                <span class="name ng-binding">Prodej bytu 1+1&nbsp;43&nbsp;m²</span>
-#                            </a>
-#                        </h2>
-        #title = property.find_element(By.CSS_SELECTOR, "h2 > a.title")
-        #print(title.text)
-        #link = title.get_attribute("href")
-
-        #print(link)
-
-        #tip = property.find_elements(By.CLASS_NAME, "tip-region")
-
-        #data.append([price.text, locality.text, link])
-        #print(tip.text)
-
-    return data 
 
 
 
@@ -164,12 +115,6 @@ def set_if_label_found(text, labels):
 
 
 def main():
-    
-    #pythojJSDriverPath = "C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python37_64/Lib/site-packages/phantomjs/phantomjs-2.1.1-windows/bin/phantomjs.exe"    
-    CHROMEDRIVER_PATH = "C:/Program Files (x86)/Microsoft Visual Studio/Shared/Python37_64/Lib/site-packages/chromedriver/chromedriver.exe"
-    options = Options()
-    options.headless = True
-
     start_time = time.time()
 
     # when using the "with" keywrod automatically quit the driver at the end of execution
@@ -178,15 +123,7 @@ def main():
     with webdriver.Chrome(CHROMEDRIVER_PATH) as myWebDriver:     #, chrome_options=options
 
         url = "https://www.sreality.cz/hledani/prodej/byty/praha?velikost=1%2B1" #+ "&strana=" + str(page) #+ "&stari=dnes"
-        
-        #driver.set_window_size(100, 100)
-        # top left of the primary monitor
-        #driver.set_window_position(200, 200)
-        # driver.maximize_window()
-        # driver.minimize_window()
-        # driver.fullscreen_window()
         myWebDriver.get(url)
-
 
 
         #next_page_available = True
